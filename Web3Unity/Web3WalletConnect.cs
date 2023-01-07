@@ -2,12 +2,14 @@ using AOT;
 using Cysharp.Threading.Tasks;
 using Nethereum.Contracts;
 using Nethereum.Hex.HexTypes;
+using Nethereum.JsonRpc.Client;
 using Nethereum.JsonRpc.Client.RpcMessages;
 using Nethereum.RPC.Eth.DTOs;
 using Nethereum.Web3;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using UnityEngine;
 using WalletConnectSharp.Core.Models;
@@ -17,6 +19,14 @@ using WalletConnectSharp.NEthereum;
 public class Web3WalletConnect
 {
     private static int id = 0;
+
+    public string Uri { get; private set; }
+
+    public WalletConnect Client { get; private set; }
+
+    public Web3 Web3Client { get; private set; }
+
+    //public WalletConnect Client { get; private set; }
 
     private static Dictionary<int, UniTaskCompletionSource<string>> utcs = new Dictionary<int, UniTaskCompletionSource<string>>();
     private static UniTaskCompletionSource<string> utcsConnected;
@@ -63,8 +73,56 @@ public class Web3WalletConnect
     }
 
 
-    public Web3WalletConnect()
+    public Web3WalletConnect(string url)
     {
+        var metadata = new ClientMeta()
+        {
+            Description = "This is a test of the Nethereum.WalletConnect feature",
+            Icons = new[] { "https://app.warriders.com/favicon.ico" },
+            Name = "WalletConnect Test",
+            URL = "https://app.warriders.com"
+        };
+
+        Client = new WalletConnect(metadata);
+        //var nethereum = new Web3(walletConnect.CreateProvider(new Uri("https//rpc.testnet.fantom.network/")));
+        Client.OnSessionCreated += Client_OnSessionCreated;
+        Client.OnTransportConnect += Client_OnTransportConnect;
+        Client.OnSend += Client_OnSend;
+        Client.OnSessionConnect += Client_OnSessionConnect;
+        Uri = Client.URI;
+
+        Connect(url);
+    }
+
+    private void Client_OnSessionConnect(object? sender, WalletConnectSharp.Core.WalletConnectSession e)
+    {
+
+        System.Diagnostics.Debug.WriteLine($"session connect");
+    }
+
+    private void Client_OnSend(object? sender, WalletConnectSharp.Core.WalletConnectSession e)
+    {
+        System.Diagnostics.Debug.WriteLine($"send");
+    }
+
+    private void Client_OnTransportConnect(object? sender, WalletConnectSharp.Core.WalletConnectProtocol e)
+    {
+        System.Diagnostics.Debug.WriteLine($"Transport");
+    }
+
+    private void Client_OnSessionCreated(object? sender, WalletConnectSharp.Core.WalletConnectSession e)
+    {
+        System.Diagnostics.Debug.WriteLine($"session");
+    }
+
+    public async Task Connect(string url)
+    {
+        await Client.Connect();
+        System.Diagnostics.Debug.WriteLine($"Address: {Client.Accounts[0]}");
+        System.Diagnostics.Debug.WriteLine($"Chain ID: {Client.ChainId}");
+
+        Web3Client = Client.BuildWeb3(new Uri(url)).AsWalletAccount(true);
+
     }
 
     public static async Task<string> Send<T>(T _function, string _address) where T : FunctionMessage, new()
