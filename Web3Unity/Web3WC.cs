@@ -76,14 +76,14 @@ public class Web3WC
     }
 
 
-    public Web3WC(string url)
+    public Web3WC(string rpcUrl, string name , string description , string icon,  string url)
     {
         var metadata = new ClientMeta()
         {
-            Description = "This is a test of the Nethereum.WalletConnect feature",
-            Icons = new[] { "https://app.warriders.com/favicon.ico" },
-            Name = "WalletConnect Test",
-            URL = "https://app.warriders.com"
+            Description = description,
+            Icons = new[] { icon },
+            Name = name,
+            URL = url
         };
 
         Client = new WalletConnect(metadata);
@@ -94,7 +94,7 @@ public class Web3WC
         Client.OnSessionConnect += Client_OnSessionConnect;
         Uri = Client.URI;
 
-        Connect(url);
+        Connect(rpcUrl);
     }
 
     private void Client_OnSessionConnect(object? sender, WalletConnectSharp.Core.WalletConnectSession e)
@@ -118,13 +118,13 @@ public class Web3WC
         System.Diagnostics.Debug.WriteLine($"session");
     }
 
-    public async Task Connect(string url)
+    public async Task Connect(string rpcUrl)
     {
         await Client.Connect();
         System.Diagnostics.Debug.WriteLine($"Address: {Client.Accounts[0]}");
         System.Diagnostics.Debug.WriteLine($"Chain ID: {Client.ChainId}");
 
-        Web3Client = Client.BuildWeb3(new Uri(url)).AsWalletAccount(true);
+        Web3Client = Client.BuildWeb3(new Uri(rpcUrl)).AsWalletAccount(true);
 
     }
 

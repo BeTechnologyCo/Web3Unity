@@ -54,19 +54,22 @@ namespace Web3Unity
             ConnectionType = ConnectionType.Metamask;
             MetamaskProvider provider = new MetamaskProvider();
             Web3 = new Web3(provider);
-
         }
 
         /// <summary>
         /// Etablish a connection with wallet connect
         /// </summary>
-        /// <param name="rpcUrl">the rpc url to call contract</param>
-        /// <returns>the uri to connect to wallet connect</returns>
-        public string ConnectWalletConnect(string rpcUrl = "https://rpc.builder0x69.io")
+        /// <param name="rpcUrl">The rpc url to call contract</param>
+        /// <param name="name">Name of the dapp who appears in the popin in the wallet</param>
+        /// <param name="description">Description of the dapp</param>
+        /// <param name="icon">Icon show on the popin</param>
+        /// <param name="url">Url to the project</param>
+        /// <returns>The uri to connect to wallet connect</returns>
+        public string ConnectWalletConnect(string rpcUrl = "https://rpc.builder0x69.io", string name = "Test Unity", string description = "Test dapp", string icon = "https://unity.com/favicon.ico", string url = "https://unity.com/")
         {
             ConnectionType = ConnectionType.WalletConnect;
             RpcUrl = rpcUrl;
-            Web3WC = new Web3WC(rpcUrl);
+            Web3WC = new Web3WC(rpcUrl,name,description,icon, url);
             Web3WC.Client.OnSessionConnect += Client_OnSessionConnect;
           
             return Web3WC.Uri;
