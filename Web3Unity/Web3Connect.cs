@@ -18,6 +18,8 @@ namespace Web3Unity
 
         public Web3WC Web3WC { get; private set; }
 
+        public MetamaskProvider MetamaskProvider{ get; private set; }
+
         private static readonly Lazy<Web3Connect> lazy =
         new Lazy<Web3Connect>(() => new Web3Connect());
 
@@ -52,8 +54,8 @@ namespace Web3Unity
         public void ConnectMetamask()
         {
             ConnectionType = ConnectionType.Metamask;
-            MetamaskProvider provider = new MetamaskProvider();
-            Web3 = new Web3(provider);
+            MetamaskProvider = new MetamaskProvider();
+            Web3 = new Web3(MetamaskProvider);
         }
 
         /// <summary>
