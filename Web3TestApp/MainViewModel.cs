@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using TokenContract;
 using WalletConnectSharp.Desktop;
 using Web3Unity;
 
@@ -49,12 +50,13 @@ namespace Web3TestApp
         {
 
             // usdc on ethereum
-            var contract = new Web3Contract("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48");
-            var tokenBalance = new TokenDefinition.BalanceOfFunction() { Account = "0xf977814e90da44bfa03b6295a0616a897441acec" };
-            var balance = await contract.Call<TokenDefinition.BalanceOfFunction, TokenDefinition.BalanceOfOutputDTO>(tokenBalance);
+            var contract = new TokenContractService("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48");
+            //var tokenBalance = new TokenDefinition.BalanceOfFunction() { Account = "0xf977814e90da44bfa03b6295a0616a897441acec" };
+            //var balance = await contract.Call<TokenDefinition.BalanceOfFunction, TokenDefinition.BalanceOfOutputDTO>(tokenBalance);
 
+            var balance = await contract.BalanceOfQueryAsync("0xf977814e90da44bfa03b6295a0616a897441acec");
             //Uri = Web3Connect.Instance.Web3WC.Uri;
-            Debug.WriteLine($"balance {balance.ReturnValue1}");
+            Debug.WriteLine($"balance {balance}");
         }
 
         public void OnPropertyChanged([CallerMemberName] string name = "") =>

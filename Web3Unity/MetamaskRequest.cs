@@ -2,16 +2,20 @@
 using Newtonsoft.Json;
 using System;
 
-
-[JsonObject]
-public class MetamaskRequest: RpcRequestMessage
+namespace Web3Unity
 {
-    public MetamaskRequest(object id, string method, string from, params object[] parameterList) : base(id, method,
-          parameterList)
+
+    [JsonObject]
+    public class MetamaskRequest : RpcRequestMessage
     {
-        From = from;
+        public MetamaskRequest(object id, string method, string from, params object[] parameterList) : base(id, method,
+              parameterList)
+        {
+            From = from;
+        }
+
+        [JsonProperty("from")]
+        public string From { get; private set; }
     }
 
-    [JsonProperty("from")]
-    public string From { get; private set; }
 }

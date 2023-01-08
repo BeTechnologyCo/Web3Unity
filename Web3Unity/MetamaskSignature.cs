@@ -4,13 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-
-public enum MetamaskSignature
+namespace Web3Unity
 {
-    eth_sign = 0,
-    personal_sign = 1,
-    signTypedData_v1 = 2,
-    signTypedData_v3 = 3,
-    signTypedData_v4 = 4,
-}
+    public enum MetamaskSignature
+    {
+        eth_sign = 0,
+        personal_sign = 1,
+        signTypedData_v1 = 2,
+        signTypedData_v3 = 3,
+        signTypedData_v4 = 4,
+    }
 
+}

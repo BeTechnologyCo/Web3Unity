@@ -18,170 +18,173 @@ using System.Threading.Tasks;
 using UnityEngine;
 using RpcError = Nethereum.JsonRpc.Client.RpcError;
 
-public class MetamaskProvider : IClient
+namespace Web3Unity
 {
-
-    [DllImport("__Internal")]
-    private static extern void Connect(Action<int, string> callback);
-
-    [DllImport("__Internal")]
-    private static extern void Request(string jsonCall, Action<int, string> callback);
-
-    [DllImport("__Internal")]
-    private static extern bool IsMetamaskAvailable();
-
-    [DllImport("__Internal")]
-    private static extern string GetSelectedAddress();
-
-    [DllImport("__Internal")]
-    private static extern bool IsConnected();
-
-    private static int id = 0;
-
-    public static event EventHandler<string> OnAccountConnected;
-    public static event EventHandler<string> OnAccountChanged;
-    public static event EventHandler<BigInteger> OnChainChanged;
-    public static event EventHandler OnAccountDisconnected;
-
-    private static Dictionary<int, UniTaskCompletionSource<string>> utcs = new Dictionary<int, UniTaskCompletionSource<string>>();
-    private static UniTaskCompletionSource<string> utcsConnected;
-
-    public RequestInterceptor OverridingRequestInterceptor { get; set; }
-
-    [MonoPInvokeCallback(typeof(Action<int, string>))]
-    private static void RequestCallResult(int key, string val)
+    public class MetamaskProvider : IClient
     {
-        if (utcs.ContainsKey(key))
-        {
-            utcs[key].TrySetResult(val);
-            Debug.Log($"Key found Web3GL {key}");
-        }
-        else
-        {
-            Debug.LogWarning($"Key not found Web3GL {key}");
-        }
-    }
 
-    [MonoPInvokeCallback(typeof(Action<int, string>))]
-    private static void Connected(int changeType, string result)
-    {
-        switch (changeType)
-        {
-            case 1:
-                utcsConnected?.TrySetResult(result);
-                if (OnAccountConnected != null)
-                {
-                    OnAccountConnected(new Web3GL(), result);
-                }
+        [DllImport("__Internal")]
+        private static extern void Connect(Action<int, string> callback);
 
-                break;
-            case 2:
-                if (OnChainChanged != null)
-                {
-                    OnChainChanged(new Web3GL(), BigInteger.Parse(result));
-                }
-                break;
-            case 3:
-                if (OnAccountChanged != null)
-                {
-                    OnAccountChanged(new Web3GL(), result);
-                }
-                break;
-            case 4:
-                if (OnAccountDisconnected != null)
-                {
-                    OnAccountDisconnected(new Web3GL(), new EventArgs());
-                }
-                break;
+        [DllImport("__Internal")]
+        private static extern void Request(string jsonCall, Action<int, string> callback);
+
+        [DllImport("__Internal")]
+        private static extern bool IsMetamaskAvailable();
+
+        [DllImport("__Internal")]
+        private static extern string GetSelectedAddress();
+
+        [DllImport("__Internal")]
+        private static extern bool IsConnected();
+
+        private static int id = 0;
+
+        public static event EventHandler<string> OnAccountConnected;
+        public static event EventHandler<string> OnAccountChanged;
+        public static event EventHandler<BigInteger> OnChainChanged;
+        public static event EventHandler OnAccountDisconnected;
+
+        private static Dictionary<int, UniTaskCompletionSource<string>> utcs = new Dictionary<int, UniTaskCompletionSource<string>>();
+        private static UniTaskCompletionSource<string> utcsConnected;
+
+        public RequestInterceptor OverridingRequestInterceptor { get; set; }
+
+        [MonoPInvokeCallback(typeof(Action<int, string>))]
+        private static void RequestCallResult(int key, string val)
+        {
+            if (utcs.ContainsKey(key))
+            {
+                utcs[key].TrySetResult(val);
+                Debug.Log($"Key found Web3GL {key}");
+            }
+            else
+            {
+                Debug.LogWarning($"Key not found Web3GL {key}");
+            }
         }
 
-    }
-
-    public async UniTask<RpcResponseMessage> RequestCallAsync(int val, string jsonCall)
-    {
-        utcs[val] = new UniTaskCompletionSource<string>();
-        Request(jsonCall, RequestCallResult);
-        string result = await utcs[val].Task;
-        return JsonConvert.DeserializeObject<RpcResponseMessage>(result);
-    }
-
-
-    public MetamaskProvider()
-    {
-        ConnectAccount();
-    }
-
-
-    public async Task<string> ConnectAccount()
-    {
-        utcsConnected = new UniTaskCompletionSource<string>();
-        Connect(Connected);
-        string result = await utcsConnected.Task;
-        return result;
-    }
-
-    public async Task<RpcRequestResponseBatch> SendBatchRequestAsync(RpcRequestResponseBatch rpcRequestResponseBatch)
-    {
-        foreach (var i in rpcRequestResponseBatch.BatchItems)
+        [MonoPInvokeCallback(typeof(Action<int, string>))]
+        private static void Connected(int changeType, string result)
         {
-            var request = i.RpcRequestMessage;
+            switch (changeType)
+            {
+                case 1:
+                    utcsConnected?.TrySetResult(result);
+                    if (OnAccountConnected != null)
+                    {
+                        OnAccountConnected(new MetamaskProvider(), result);
+                    }
+
+                    break;
+                case 2:
+                    if (OnChainChanged != null)
+                    {
+                        OnChainChanged(new MetamaskProvider(), BigInteger.Parse(result));
+                    }
+                    break;
+                case 3:
+                    if (OnAccountChanged != null)
+                    {
+                        OnAccountChanged(new MetamaskProvider(), result);
+                    }
+                    break;
+                case 4:
+                    if (OnAccountDisconnected != null)
+                    {
+                        OnAccountDisconnected(new MetamaskProvider(), new EventArgs());
+                    }
+                    break;
+            }
+
+        }
+
+        public async UniTask<RpcResponseMessage> RequestCallAsync(int val, string jsonCall)
+        {
+            utcs[val] = new UniTaskCompletionSource<string>();
+            Request(jsonCall, RequestCallResult);
+            string result = await utcs[val].Task;
+            return JsonConvert.DeserializeObject<RpcResponseMessage>(result);
+        }
+
+
+        public MetamaskProvider()
+        {
+            ConnectAccount();
+        }
+
+
+        public async Task<string> ConnectAccount()
+        {
+            utcsConnected = new UniTaskCompletionSource<string>();
+            Connect(Connected);
+            string result = await utcsConnected.Task;
+            return result;
+        }
+
+        public async Task<RpcRequestResponseBatch> SendBatchRequestAsync(RpcRequestResponseBatch rpcRequestResponseBatch)
+        {
+            foreach (var i in rpcRequestResponseBatch.BatchItems)
+            {
+                var request = i.RpcRequestMessage;
+                RpcResponseMessage response = await SendAsync(request.Method, request.RawParameters);
+                var resp = new RpcResponseMessage(request.Id, response.Result);
+                rpcRequestResponseBatch.UpdateBatchItemResponses(new List<RpcResponseMessage>() { resp });
+            }
+            return rpcRequestResponseBatch;
+        }
+
+        public async Task<T> SendRequestAsync<T>(RpcRequest request, string route = null)
+        {
             RpcResponseMessage response = await SendAsync(request.Method, request.RawParameters);
-            var resp = new RpcResponseMessage(request.Id, response.Result);
-            rpcRequestResponseBatch.UpdateBatchItemResponses(new List<RpcResponseMessage>() { resp });
+            try
+            {
+                return response.GetResult<T>();
+            }
+            catch (FormatException formatException)
+            {
+                throw new RpcResponseFormatException("Invalid format found in RPC response", formatException);
+            }
         }
-        return rpcRequestResponseBatch;
-    }
 
-    public async Task<T> SendRequestAsync<T>(RpcRequest request, string route = null)
-    {
-        RpcResponseMessage response = await SendAsync(request.Method, request.RawParameters);
-        try
+        public async Task<T> SendRequestAsync<T>(string method, string route = null, params object[] paramList)
         {
-            return response.GetResult<T>();
+            RpcResponseMessage response = await SendAsync(method, paramList);
+            try
+            {
+                return response.GetResult<T>();
+            }
+            catch (FormatException formatException)
+            {
+                throw new RpcResponseFormatException("Invalid format found in RPC response", formatException);
+            }
         }
-        catch (FormatException formatException)
+
+        public async Task SendRequestAsync(RpcRequest request, string route = null)
         {
-            throw new RpcResponseFormatException("Invalid format found in RPC response", formatException);
+            await SendAsync(request.Method, request.RawParameters);
         }
-    }
 
-    public async Task<T> SendRequestAsync<T>(string method, string route = null, params object[] paramList)
-    {
-        RpcResponseMessage response = await SendAsync(method, paramList);
-        try
+        public async Task SendRequestAsync(string method, string route = null, params object[] paramList)
         {
-            return response.GetResult<T>();
+            await SendAsync(method, paramList);
         }
-        catch (FormatException formatException)
+
+        private async Task<RpcResponseMessage> SendAsync(string method, params object[] paramList)
         {
-            throw new RpcResponseFormatException("Invalid format found in RPC response", formatException);
+            int val = ++id;
+            MetamaskRequest rpcRequest = new MetamaskRequest(val, method, GetSelectedAddress(), paramList);
+            var jsonCall = JsonConvert.SerializeObject(rpcRequest);
+            RpcResponseMessage response = await RequestCallAsync(val, jsonCall);
+            HandleRpcError(response, method);
+            return response;
         }
-    }
 
-    public async Task SendRequestAsync(RpcRequest request, string route = null)
-    {
-        await SendAsync(request.Method, request.RawParameters);
-    }
-
-    public async Task SendRequestAsync(string method, string route = null, params object[] paramList)
-    {
-        await SendAsync(method, paramList);
-    }
-
-    private async Task<RpcResponseMessage> SendAsync(string method, params object[] paramList)
-    {
-        int val = ++id;
-        MetamaskRequest rpcRequest = new MetamaskRequest(val, method, GetSelectedAddress(), paramList);
-        var jsonCall = JsonConvert.SerializeObject(rpcRequest);
-        RpcResponseMessage response = await RequestCallAsync(val, jsonCall);
-        HandleRpcError(response, method);
-        return response;
-    }
-
-    protected void HandleRpcError(RpcResponseMessage response, string reqMsg)
-    {
-        if (response.HasError)
-            throw new RpcResponseException(new RpcError(response.Error.Code, response.Error.Message + ": " + reqMsg,
-                response.Error.Data));
+        protected void HandleRpcError(RpcResponseMessage response, string reqMsg)
+        {
+            if (response.HasError)
+                throw new RpcResponseException(new RpcError(response.Error.Code, response.Error.Message + ": " + reqMsg,
+                    response.Error.Data));
+        }
     }
 }
