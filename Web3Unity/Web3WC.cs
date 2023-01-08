@@ -1,20 +1,16 @@
-using AOT;
 using Cysharp.Threading.Tasks;
 using Nethereum.Contracts;
 using Nethereum.Hex.HexTypes;
-using Nethereum.JsonRpc.Client;
 using Nethereum.JsonRpc.Client.RpcMessages;
 using Nethereum.RPC.Eth.DTOs;
 using Nethereum.Web3;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Threading.Tasks;
 using UnityEngine;
 using WalletConnectSharp.Core.Models;
-using WalletConnectSharp.Desktop;
-using WalletConnectSharp.NEthereum;
+using WalletConnectSharp.Unity;
 
 namespace Web3Unity
 {
@@ -88,34 +84,35 @@ namespace Web3Unity
                 URL = url
             };
 
-            Client = new WalletConnect(metadata);
-            //var nethereum = new Web3(walletConnect.CreateProvider(new Uri("https//rpc.testnet.fantom.network/")));
-            Client.OnSessionCreated += Client_OnSessionCreated;
-            Client.OnTransportConnect += Client_OnTransportConnect;
-            Client.OnSend += Client_OnSend;
-            Client.OnSessionConnect += Client_OnSessionConnect;
+            Client = WalletConnect.Instance;
+            //Client = new WalletConnect(metadata);
+            ////var nethereum = new Web3(walletConnect.CreateProvider(new Uri("https//rpc.testnet.fantom.network/")));
+            //Client.OnSessionCreated += Client_OnSessionCreated;
+            //Client.OnTransportConnect += Client_OnTransportConnect;
+            //Client.OnSend += Client_OnSend;
+            //Client.OnSessionConnect += Client_OnSessionConnect;
             Uri = Client.URI;
 
             Connect(rpcUrl);
         }
 
-        private void Client_OnSessionConnect(object? sender, WalletConnectSharp.Core.WalletConnectSession e)
+        private void Client_OnSessionConnect(object sender, WalletConnectSharp.Core.WalletConnectSession e)
         {
 
             System.Diagnostics.Debug.WriteLine($"session connect");
         }
 
-        private void Client_OnSend(object? sender, WalletConnectSharp.Core.WalletConnectSession e)
+        private void Client_OnSend(object sender, WalletConnectSharp.Core.WalletConnectSession e)
         {
             System.Diagnostics.Debug.WriteLine($"send");
         }
 
-        private void Client_OnTransportConnect(object? sender, WalletConnectSharp.Core.WalletConnectProtocol e)
+        private void Client_OnTransportConnect(object sender, WalletConnectSharp.Core.WalletConnectProtocol e)
         {
             System.Diagnostics.Debug.WriteLine($"Transport");
         }
 
-        private void Client_OnSessionCreated(object? sender, WalletConnectSharp.Core.WalletConnectSession e)
+        private void Client_OnSessionCreated(object sender, WalletConnectSharp.Core.WalletConnectSession e)
         {
             System.Diagnostics.Debug.WriteLine($"session");
         }
