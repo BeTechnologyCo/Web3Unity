@@ -1,6 +1,8 @@
 ﻿
 using Nethereum.Web3;
 using Nethereum.Web3.Accounts;
+using WalletConnectSharp.Desktop;
+using WalletConnectSharp.NEthereum;
 
 namespace Web3Unity
 {
@@ -29,18 +31,6 @@ namespace Web3Unity
 
         }
 
-
-        /// <summary>
-        /// Etablish a connection with the desired provider
-        /// </summary>
-        /// <param name="connectionType">Connection Type 0 for direct RPC connection, 1 For WalletConnect, 2 for Metamask (Only in WebGL)</param>
-        /// <param name="chainId">Chain Id you want to connect</param>
-        /// <param name="rpcUrl">Rpc url, usefull for RPC & WalletConnect connexion</param>
-        /// <param name="privateKey"></param>
-        public void Connect(ConnectionType connectionType, string chainId = "1", string rpcUrl = "https://rpc.builder0x69.io", string privateKey = "0x3141592653589793238462643383279502884197169399375105820974944592")
-        {
-
-        }
 
         /// <summary>
         /// Etablish a connection with nethereum classic RPC
@@ -77,11 +67,15 @@ namespace Web3Unity
             ConnectionType = ConnectionType.WalletConnect;
             RpcUrl = rpcUrl;
             Web3WC = new Web3WC(rpcUrl);
-            Web3 = Web3WC.Web3Client;
+            Web3WC.Client.OnSessionConnect += Client_OnSessionConnect;
+          
             return Web3WC.Uri;
         }
 
-
+        private void Client_OnSessionConnect(object? sender, WalletConnectSharp.Core.WalletConnectSession e)
+        {
+            Web3 = new Web3(Web3WC.Client.CreateProvider(new Uri(RpcUrl)));
+        }
 
         public void Disconnect()
         {

@@ -125,10 +125,7 @@ public class MetamaskProvider : IClient
         foreach (var i in rpcRequestResponseBatch.BatchItems)
         {
             var request = i.RpcRequestMessage;
-            int val = ++id;
-            MetamaskRequest rpcRequest = new MetamaskRequest(val, request.Method, GetSelectedAddress(), request.RawParameters);
-            var jsonCall = JsonConvert.SerializeObject(rpcRequest);
-            RpcResponseMessage response = await RequestCallAsync(val, jsonCall);
+            RpcResponseMessage response = await SendAsync(request.Method, request.RawParameters);
             var resp = new RpcResponseMessage(request.Id, response.Result);
             rpcRequestResponseBatch.UpdateBatchItemResponses(new List<RpcResponseMessage>() { resp });
         }
@@ -137,11 +134,7 @@ public class MetamaskProvider : IClient
 
     public async Task<T> SendRequestAsync<T>(RpcRequest request, string route = null)
     {
-        int val = ++id;
-        MetamaskRequest rpcRequest = new MetamaskRequest(val, request.Method, GetSelectedAddress(), null);
-        var jsonCall = JsonConvert.SerializeObject(rpcRequest);
-        RpcResponseMessage response = await RequestCallAsync(val, jsonCall);
-        HandleRpcError(response, request.Method);
+        RpcResponseMessage response = await SendAsync(request.Method, request.RawParameters);
         try
         {
             return response.GetResult<T>();
@@ -154,11 +147,7 @@ public class MetamaskProvider : IClient
 
     public async Task<T> SendRequestAsync<T>(string method, string route = null, params object[] paramList)
     {
-        int val = ++id;
-        MetamaskRequest rpcRequest = new MetamaskRequest(val, method, GetSelectedAddress(), paramList);
-        var jsonCall = JsonConvert.SerializeObject(rpcRequest);
-        RpcResponseMessage response = await RequestCallAsync(val, jsonCall);
-        HandleRpcError(response, method);
+        RpcResponseMessage response = await SendAsync(method, paramList);
         try
         {
             return response.GetResult<T>();
@@ -171,20 +160,22 @@ public class MetamaskProvider : IClient
 
     public async Task SendRequestAsync(RpcRequest request, string route = null)
     {
-        int val = ++id;
-        MetamaskRequest rpcRequest = new MetamaskRequest(val, request.Method, GetSelectedAddress(), null);
-        var jsonCall = JsonConvert.SerializeObject(rpcRequest);
-        RpcResponseMessage response = await RequestCallAsync(val, jsonCall);
-        HandleRpcError(response, request.Method);
+        await SendAsync(request.Method, request.RawParameters);
     }
 
     public async Task SendRequestAsync(string method, string route = null, params object[] paramList)
+    {
+        await SendAsync(method, paramList);
+    }
+
+    private async Task<RpcResponseMessage> SendAsync(string method, params object[] paramList)
     {
         int val = ++id;
         MetamaskRequest rpcRequest = new MetamaskRequest(val, method, GetSelectedAddress(), paramList);
         var jsonCall = JsonConvert.SerializeObject(rpcRequest);
         RpcResponseMessage response = await RequestCallAsync(val, jsonCall);
         HandleRpcError(response, method);
+        return response;
     }
 
     protected void HandleRpcError(RpcResponseMessage response, string reqMsg)

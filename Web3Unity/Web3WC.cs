@@ -16,6 +16,9 @@ using WalletConnectSharp.Core.Models;
 using WalletConnectSharp.Desktop;
 using WalletConnectSharp.NEthereum;
 
+/// <summary>
+/// Wallet connect provider
+/// </summary>
 public class Web3WC
 {
     private static int id = 0;

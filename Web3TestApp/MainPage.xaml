@@ -40,7 +40,7 @@
             <Button
                 x:Name="CounterBtn"
                 Text="Request connection"
-                Command="{Binding RequestConnection}"
+                Command="{Binding RequestConnectionCommand}"
                 HorizontalOptions="Center" />
 
             <FlexLayout WidthRequest="200" AlignContent="Center" AlignItems="Start">
@@ -54,7 +54,10 @@
   Format="QrCode"
   Margin="3"></zxing:BarcodeGeneratorView>
             </FlexLayout>
-
+            <Button
+                Text="Get balance"
+                Command="{Binding GetTokenBalanceCommand}"
+                HorizontalOptions="Center" />
         </VerticalStackLayout>
     </ScrollView>
 
