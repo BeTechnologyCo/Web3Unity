@@ -16,7 +16,7 @@ using WalletConnectSharp.Core.Models;
 using WalletConnectSharp.Desktop;
 using WalletConnectSharp.NEthereum;
 
-public class Web3WalletConnect
+public class Web3WC
 {
     private static int id = 0;
 
@@ -73,7 +73,7 @@ public class Web3WalletConnect
     }
 
 
-    public Web3WalletConnect(string url)
+    public Web3WC(string url)
     {
         var metadata = new ClientMeta()
         {

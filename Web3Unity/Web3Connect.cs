@@ -14,6 +14,8 @@ namespace Web3Unity
 
         public ConnectionType ConnectionType { get; private set; }
 
+        public Web3WC Web3WC { get; private set; }
+
         private static readonly Lazy<Web3Connect> lazy =
         new Lazy<Web3Connect>(() => new Web3Connect());
 
@@ -40,6 +42,11 @@ namespace Web3Unity
 
         }
 
+        /// <summary>
+        /// Etablish a connection with nethereum classic RPC
+        /// </summary>
+        /// <param name="rpcUrl">rpc url to connect</param>
+        /// <param name="privateKey">private key to sign call</param>
         public void ConnectRPC(string rpcUrl = "https://rpc.builder0x69.io", string privateKey = "0x3141592653589793238462643383279502884197169399375105820974944592")
         {
             ConnectionType = ConnectionType.RPC;
@@ -49,6 +56,9 @@ namespace Web3Unity
             Web3 = new Web3(account, RpcUrl);
         }
 
+        /// <summary>
+        /// Etablish a connection with metasmaks browser plugin (only for webGL)
+        /// </summary>
         public void ConnectMetamask()
         {
             ConnectionType = ConnectionType.Metamask;
@@ -57,12 +67,18 @@ namespace Web3Unity
 
         }
 
-        public void ConnectWalletConnect(string rpcUrl = "https://rpc.builder0x69.io")
+        /// <summary>
+        /// Etablish a connection with wallet connect
+        /// </summary>
+        /// <param name="rpcUrl">the rpc url to call contract</param>
+        /// <returns>the uri to connect to wallet connect</returns>
+        public string ConnectWalletConnect(string rpcUrl = "https://rpc.builder0x69.io")
         {
             ConnectionType = ConnectionType.WalletConnect;
             RpcUrl = rpcUrl;
-            Web3WalletConnect walletConnect = new Web3WalletConnect(rpcUrl);
-            Web3 = walletConnect.Web3Client;
+            Web3WC = new Web3WC(rpcUrl);
+            Web3 = Web3WC.Web3Client;
+            return Web3WC.Uri;
         }
 
 

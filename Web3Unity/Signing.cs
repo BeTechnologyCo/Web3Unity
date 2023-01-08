@@ -28,7 +28,7 @@ public class Signing
         }
         else
         {
-            return await Web3WalletConnect.Sign(message, signatureType);
+            return await Web3WC.Sign(message, signatureType);
         }
     }
 

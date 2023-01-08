@@ -73,7 +73,7 @@ public class Web3Contract
         }
         else if(IsDeeplinking() && UseMetamask)
         {
-            return await Web3WalletConnect.Send<T>(_function, Address);
+            return await Web3WC.Send<T>(_function, Address);
         }
         else
         {
@@ -90,7 +90,7 @@ public class Web3Contract
         }
         else if (IsDeeplinking() && UseMetamask)
         {
-            return await Web3WalletConnect.SendAndWaitForReceipt<T>(_function, Address);
+            return await Web3WC.SendAndWaitForReceipt<T>(_function, Address);
         }
         else
         {
@@ -139,7 +139,7 @@ public class Web3Contract
         }
         else if (IsDeeplinking() && UseMetamask)
         {
-            return await Web3WalletConnect.EstimateGas<T>(_function, Address);
+            return await Web3WC.EstimateGas<T>(_function, Address);
         }
         else
         {
@@ -156,7 +156,7 @@ public class Web3Contract
         }
         else if (IsDeeplinking() && UseMetamask)
         {
-            return await Web3WalletConnect.SignFunction(_function, Address);
+            return await Web3WC.SignFunction(_function, Address);
         }
         else
         {

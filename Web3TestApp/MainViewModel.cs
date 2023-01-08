@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using WalletConnectSharp.Desktop;
 using Web3Unity;
 
 namespace Web3TestApp
@@ -29,19 +30,15 @@ namespace Web3TestApp
             }
         }
 
-        Test t;
-
         public MainViewModel()
         {
             RequestConnection = new Command(() => Connect());
-
-
         }
 
         public void Connect()
         {
-            t = new Test();
-            Uri = t.GetUri();
+            Uri = Web3Connect.Instance.ConnectWalletConnect();
+            //Uri = Web3Connect.Instance.Web3WC.Uri;
             Debug.WriteLine($"URI {Uri}");
         }
 
