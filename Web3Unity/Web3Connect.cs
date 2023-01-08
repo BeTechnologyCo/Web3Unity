@@ -1,6 +1,7 @@
 ﻿
 using Nethereum.Web3;
 using Nethereum.Web3.Accounts;
+using System;
 using WalletConnectSharp.Desktop;
 using WalletConnectSharp.NEthereum;
 
@@ -77,7 +78,7 @@ namespace Web3Unity
             return Web3WC.Uri;
         }
 
-        private void Client_OnSessionConnect(object? sender, WalletConnectSharp.Core.WalletConnectSession e)
+        private void Client_OnSessionConnect(object sender, WalletConnectSharp.Core.WalletConnectSession e)
         {
             //  Web3 = new Web3(Web3WC.Client.CreateProvider(new Uri(RpcUrl)));
             Web3 = Web3WC.Client.BuildWeb3(new Uri(RpcUrl)).AsWalletAccount(true);

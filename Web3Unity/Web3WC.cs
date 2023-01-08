@@ -99,23 +99,23 @@ namespace Web3Unity
             Connect(rpcUrl);
         }
 
-        private void Client_OnSessionConnect(object? sender, WalletConnectSharp.Core.WalletConnectSession e)
+        private void Client_OnSessionConnect(object sender, WalletConnectSharp.Core.WalletConnectSession e)
         {
 
             System.Diagnostics.Debug.WriteLine($"session connect");
         }
 
-        private void Client_OnSend(object? sender, WalletConnectSharp.Core.WalletConnectSession e)
+        private void Client_OnSend(object sender, WalletConnectSharp.Core.WalletConnectSession e)
         {
             System.Diagnostics.Debug.WriteLine($"send");
         }
 
-        private void Client_OnTransportConnect(object? sender, WalletConnectSharp.Core.WalletConnectProtocol e)
+        private void Client_OnTransportConnect(object sender, WalletConnectSharp.Core.WalletConnectProtocol e)
         {
             System.Diagnostics.Debug.WriteLine($"Transport");
         }
 
-        private void Client_OnSessionCreated(object? sender, WalletConnectSharp.Core.WalletConnectSession e)
+        private void Client_OnSessionCreated(object sender, WalletConnectSharp.Core.WalletConnectSession e)
         {
             System.Diagnostics.Debug.WriteLine($"session");
         }

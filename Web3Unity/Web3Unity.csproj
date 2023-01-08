@@ -1,15 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Nethereum.Contracts" Version="4.12.0" />
+    <PackageReference Include="Nethereum.JsonRpc.RpcClient" Version="4.12.0" />
+    <PackageReference Include="Nethereum.Web3" Version="4.12.0" />
     <PackageReference Include="UniTask" Version="2.3.3" />
-    <PackageReference Include="WalletConnect.Desktop" Version="1.7.2" />
-    <PackageReference Include="WalletConnect.NEthereum" Version="1.7.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\BeTechnologyCo\WalletConnectSharp\WalletConnectSharp.Core\WalletConnectSharp.Core.csproj" />
+    <ProjectReference Include="..\..\BeTechnologyCo\WalletConnectSharp\WalletConnectSharp.Desktop\WalletConnectSharp.Desktop.csproj" />
+    <ProjectReference Include="..\..\BeTechnologyCo\WalletConnectSharp\WalletConnectSharp.NEthereum\WalletConnectSharp.NEthereum.csproj" />
   </ItemGroup>
 
   <ItemGroup>
