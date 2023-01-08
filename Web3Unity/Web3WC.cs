@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using UnityEngine;
 using WalletConnectSharp.Core.Models;
@@ -30,6 +31,8 @@ namespace Web3Unity
         public WalletConnect Client { get; private set; }
 
         public Web3 Web3Client { get; private set; }
+
+        public event EventHandler<string> Connected;
 
         //public WalletConnect Client { get; private set; }
 
@@ -127,7 +130,10 @@ namespace Web3Unity
             System.Diagnostics.Debug.WriteLine($"Chain ID: {Client.ChainId}");
 
             Web3Client = Client.BuildWeb3(new Uri(rpcUrl)).AsWalletAccount(true);
-
+            if (Connected != null)
+            {
+                Connected(this, Client.Accounts[0]);
+            }
         }
 
         public static async Task<string> Send<T>(T _function, string _address) where T : FunctionMessage, new()

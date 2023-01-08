@@ -2,6 +2,7 @@
 using Nethereum.Web3;
 using Nethereum.Web3.Accounts;
 using System;
+using System.Diagnostics;
 using WalletConnectSharp.Desktop;
 using WalletConnectSharp.NEthereum;
 
@@ -19,7 +20,7 @@ namespace Web3Unity
 
         public Web3WC Web3WC { get; private set; }
 
-        public MetamaskProvider MetamaskProvider{ get; private set; }
+        public MetamaskProvider MetamaskProvider { get; private set; }
 
         private static readonly Lazy<Web3Connect> lazy =
         new Lazy<Web3Connect>(() => new Web3Connect());
@@ -73,15 +74,15 @@ namespace Web3Unity
             ConnectionType = ConnectionType.WalletConnect;
             RpcUrl = rpcUrl;
             Web3WC = new Web3WC(rpcUrl, name, description, icon, url);
-            Web3WC.Client.OnSessionConnect += Client_OnSessionConnect;
+            Web3WC.Connected += Web3WC_Connected;
 
             return Web3WC.Uri;
         }
 
-        private void Client_OnSessionConnect(object sender, WalletConnectSharp.Core.WalletConnectSession e)
+        private void Web3WC_Connected(object sender, string e)
         {
-            //  Web3 = new Web3(Web3WC.Client.CreateProvider(new Uri(RpcUrl)));
-            Web3 = Web3WC.Client.BuildWeb3(new Uri(RpcUrl)).AsWalletAccount(true);
+            Web3 = Web3WC.Web3Client;
+            Debug.WriteLine($"connected account {e}");
         }
 
         public void Disconnect()

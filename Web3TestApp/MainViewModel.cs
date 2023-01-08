@@ -47,7 +47,7 @@ namespace Web3TestApp
 
         public void Connect()
         {
-            Uri = Web3Connect.Instance.ConnectWalletConnect();
+            Uri = Web3Connect.Instance.ConnectWalletConnect("https://rpc.ankr.com/fantom_testnet");
             //Uri = Web3Connect.Instance.Web3WC.Uri;
             Debug.WriteLine($"URI {Uri}");
         }
@@ -56,11 +56,11 @@ namespace Web3TestApp
         {
 
             // usdc on ethereum
-            var contract = new TokenContractService("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48");
+            var contract = new TokenContractService("0x61A154Ef11d64309348CAA98FB75Bd82e58c9F89");
             //var tokenBalance = new TokenDefinition.BalanceOfFunction() { Account = "0xf977814e90da44bfa03b6295a0616a897441acec" };
             //var balance = await contract.Call<TokenDefinition.BalanceOfFunction, TokenDefinition.BalanceOfOutputDTO>(tokenBalance);
 
-            var balance = await contract.BalanceOfQueryAsync("0xf977814e90da44bfa03b6295a0616a897441acec");
+            var balance = await contract.BalanceOfQueryAsync("0xDBf0DC3b7921E9Ef897031db1DAe239B4E45Af5f");
             //Uri = Web3Connect.Instance.Web3WC.Uri;
             Debug.WriteLine($"balance {balance}");
         }
@@ -68,7 +68,7 @@ namespace Web3TestApp
         public async Task Approve()
         {
             var contract = new TokenContractService("0x61A154Ef11d64309348CAA98FB75Bd82e58c9F89");
-            var receipt = await contract.ApproveRequestAndWaitForReceiptAsync(new ApproveFunction() { Amount = 10, Spender = "0x0b33fA091642107E3a63446947828AdaA188E276" });
+            var receipt = await contract.ApproveRequestAndWaitForReceiptAsync(new ApproveFunction() { FromAddress= "0xd6c39eff66c319c60ca4e85e6a5585a35c850f24", Amount = 10, Spender = "0x0b33fA091642107E3a63446947828AdaA188E276" });
             bool success = receipt.Succeeded();
             Debug.WriteLine($"receipt {success}");
         }
