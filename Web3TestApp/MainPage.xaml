@@ -58,6 +58,11 @@
                 Text="Get balance"
                 Command="{Binding GetTokenBalanceCommand}"
                 HorizontalOptions="Center" />
+
+            <Button
+                Text="Approve"
+                Command="{Binding ApproveCommand}"
+                HorizontalOptions="Center" />
         </VerticalStackLayout>
     </ScrollView>
 

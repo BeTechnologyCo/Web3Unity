@@ -69,15 +69,16 @@ namespace Web3Unity
         {
             ConnectionType = ConnectionType.WalletConnect;
             RpcUrl = rpcUrl;
-            Web3WC = new Web3WC(rpcUrl,name,description,icon, url);
+            Web3WC = new Web3WC(rpcUrl, name, description, icon, url);
             Web3WC.Client.OnSessionConnect += Client_OnSessionConnect;
-          
+
             return Web3WC.Uri;
         }
 
         private void Client_OnSessionConnect(object? sender, WalletConnectSharp.Core.WalletConnectSession e)
         {
-            Web3 = new Web3(Web3WC.Client.CreateProvider(new Uri(RpcUrl)));
+            //  Web3 = new Web3(Web3WC.Client.CreateProvider(new Uri(RpcUrl)));
+            Web3 = Web3WC.Client.BuildWeb3(new Uri(RpcUrl)).AsWalletAccount(true);
         }
 
         public void Disconnect()

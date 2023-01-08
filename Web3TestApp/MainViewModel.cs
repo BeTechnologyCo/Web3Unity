@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Nethereum.RPC.Eth.DTOs;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,6 +23,8 @@ namespace Web3TestApp
 
         public ICommand GetTokenBalanceCommand { get; private set; }
 
+        public ICommand ApproveCommand { get; private set; }
+
         private string uri;
 
         public string Uri
@@ -37,6 +41,8 @@ namespace Web3TestApp
         {
             RequestConnectionCommand = new Command(() => Connect());
             GetTokenBalanceCommand = new Command(async () => TokenBalance());
+            ApproveCommand = new Command(async () => Approve());
+
         }
 
         public void Connect()
@@ -57,6 +63,14 @@ namespace Web3TestApp
             var balance = await contract.BalanceOfQueryAsync("0xf977814e90da44bfa03b6295a0616a897441acec");
             //Uri = Web3Connect.Instance.Web3WC.Uri;
             Debug.WriteLine($"balance {balance}");
+        }
+
+        public async Task Approve()
+        {
+            var contract = new TokenContractService("0x61A154Ef11d64309348CAA98FB75Bd82e58c9F89");
+            var receipt = await contract.ApproveRequestAndWaitForReceiptAsync(new ApproveFunction() { Amount = 10, Spender = "0x0b33fA091642107E3a63446947828AdaA188E276" });
+            bool success = receipt.Succeeded();
+            Debug.WriteLine($"receipt {success}");
         }
 
         public void OnPropertyChanged([CallerMemberName] string name = "") =>
