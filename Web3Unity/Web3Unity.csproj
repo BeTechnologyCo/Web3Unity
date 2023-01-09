@@ -10,6 +10,12 @@
     <PackageReference Include="Nethereum.Web3" Version="4.12.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="UniTask" Version="2.3.3" />
+    <PackageReference Include="WebsocketSharp.Standard2" Version="2022.4.16.1520" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\BeTechnologyCo\WalletConnectSharp\WalletConnectSharp.Core\WalletConnectSharp.Core.csproj" />
+    <ProjectReference Include="..\..\BeTechnologyCo\WalletConnectSharp\WalletConnectSharp.NEthereum\WalletConnectSharp.NEthereum.csproj" />
   </ItemGroup>
 
   <ItemGroup>

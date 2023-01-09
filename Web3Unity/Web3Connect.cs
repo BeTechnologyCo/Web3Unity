@@ -19,6 +19,8 @@ namespace Web3Unity
 
         public ConnectionType ConnectionType { get; private set; }
 
+        public Web3WC Web3WC { get; private set; }
+
         public MetamaskProvider MetamaskProvider { get; private set; }
 
         private static readonly Lazy<Web3Connect> lazy =
@@ -53,11 +55,35 @@ namespace Web3Unity
         /// Etablish a connection with metasmaks browser plugin (only for webGL)
         /// </summary>
         /// <param name="autoConnect">Request connection to account at init</param>
-        public void ConnectMetamask(bool autoConnect=false)
+        public void ConnectMetamask(bool autoConnect = false)
         {
             ConnectionType = ConnectionType.Metamask;
             MetamaskProvider = new MetamaskProvider(autoConnect);
             Web3 = new Web3(MetamaskProvider);
+        }
+
+        /// <summary>
+        /// Etablish a connection with wallet connect
+        /// </summary>
+        /// <param name="rpcUrl">The rpc url to call contract</param>
+        /// <param name="name">Name of the dapp who appears in the popin in the wallet</param>
+        /// <param name="description">Description of the dapp</param>
+        /// <param name="icon">Icon show on the popin</param>
+        /// <param name="url">Url to the project</param>
+        /// <returns>The uri to connect to wallet connect</returns>
+        public string ConnectWalletConnect(string rpcUrl = "https://rpc.builder0x69.io", string name = "Test Unity", string description = "Test dapp", string icon = "https://unity.com/favicon.ico", string url = "https://unity.com/")
+        {
+            ConnectionType = ConnectionType.WalletConnect;
+            RpcUrl = rpcUrl;
+            Web3WC = new Web3WC(rpcUrl, name, description, icon, url);
+            Web3WC.Connected += Web3WC_Connected;
+
+            return Web3WC.Uri;
+        }
+
+        private void Web3WC_Connected(object sender, string e)
+        {
+            Web3 = Web3WC.Web3Client;
         }
 
         public async Task<string> Sign(string message, MetamaskSignature sign = MetamaskSignature.personal_sign)

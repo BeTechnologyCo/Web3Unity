@@ -1,4 +1,6 @@
-﻿namespace Web3TestApp
+﻿using System.Text;
+
+namespace Web3TestApp
 {
     public partial class MainPage : ContentPage
     {
@@ -7,6 +9,8 @@
         public MainPage()
         {
             InitializeComponent();
+            System.Text.Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            var enc = System.Text.Encoding.GetEncoding("gb2312");
         }
 
         private void OnCounterClicked(object sender, EventArgs e)
