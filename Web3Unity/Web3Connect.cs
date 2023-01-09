@@ -36,6 +36,8 @@ namespace Web3Unity
         /// </summary>
         public event EventHandler<string> Connected;
 
+        public string AccountAddress { get; private set; }
+
         private Web3Connect()
         {
 
@@ -70,6 +72,7 @@ namespace Web3Unity
 
         private void MetamaskProvider_OnAccountConnected(object sender, string e)
         {
+            AccountAddress = e;
             if (Connected != null)
             {
                 Connected(this, e);
@@ -97,6 +100,7 @@ namespace Web3Unity
 
         private void Web3WC_Connected(object sender, string e)
         {
+            AccountAddress = e;
             Web3 = Web3WC.Web3Client;
             if (Connected != null)
             {

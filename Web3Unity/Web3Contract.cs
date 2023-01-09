@@ -37,6 +37,14 @@ namespace Web3Unity
             }
         }
 
+        private WalletConnect WalletConnect
+        {
+            get
+            {
+                return Web3Connect.Instance.Web3WC.Client;
+            }
+        }
+
         private ConnectionType ConnectionType
         {
             get
@@ -74,6 +82,10 @@ namespace Web3Unity
             }
             else
             {
+                if (ConnectionType == ConnectionType.WalletConnect)
+                {
+                    _function.FromAddress = Web3Connect.Instance.AccountAddress;
+                }
                 var contractHandler = Web3.Eth.GetContractTransactionHandler<T>();
                 return await contractHandler.SendRequestAsync(Address, _function);
             }
@@ -87,6 +99,10 @@ namespace Web3Unity
             }
             else
             {
+                if (ConnectionType == ConnectionType.WalletConnect)
+                {
+                    _function.FromAddress = Web3Connect.Instance.AccountAddress;
+                }
                 var contractHandler = Web3.Eth.GetContractTransactionHandler<T>();
                 return await contractHandler.SendRequestAndWaitForReceiptAsync(Address, _function);
             }
@@ -132,6 +148,10 @@ namespace Web3Unity
             }
             else
             {
+                if (ConnectionType == ConnectionType.WalletConnect)
+                {
+                    _function.FromAddress = Web3Connect.Instance.AccountAddress;
+                }
                 var contractHandler = Web3.Eth.GetContractTransactionHandler<T>();
                 return await contractHandler.EstimateGasAsync(Address, _function);
             }
@@ -145,6 +165,10 @@ namespace Web3Unity
             }
             else
             {
+                if (ConnectionType == ConnectionType.WalletConnect)
+                {
+                    _function.FromAddress = Web3Connect.Instance.AccountAddress;
+                }
                 var contractHandler = Web3.Eth.GetContractTransactionHandler<T>();
                 return await contractHandler.SignTransactionAsync(Address, _function);
             }
