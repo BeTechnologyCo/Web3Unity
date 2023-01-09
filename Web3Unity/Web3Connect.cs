@@ -31,6 +31,11 @@ namespace Web3Unity
 
         public static Web3Connect Instance { get { return lazy.Value; } }
 
+        /// <summary>
+        /// Fire when wallet connected, return current account (Metamask & WalletConnect)
+        /// </summary>
+        public event EventHandler<string> Connected;
+
         private Web3Connect()
         {
 
@@ -59,7 +64,16 @@ namespace Web3Unity
         {
             ConnectionType = ConnectionType.Metamask;
             MetamaskProvider = new MetamaskProvider(autoConnect);
+            MetamaskProvider.OnAccountConnected += MetamaskProvider_OnAccountConnected;
             Web3 = new Web3(MetamaskProvider);
+        }
+
+        private void MetamaskProvider_OnAccountConnected(object sender, string e)
+        {
+            if (Connected != null)
+            {
+                Connected(this, e);
+            }
         }
 
         /// <summary>
@@ -84,6 +98,10 @@ namespace Web3Unity
         private void Web3WC_Connected(object sender, string e)
         {
             Web3 = Web3WC.Web3Client;
+            if (Connected != null)
+            {
+                Connected(this, e);
+            }
         }
 
         public async Task<string> Sign(string message, MetamaskSignature sign = MetamaskSignature.personal_sign)
