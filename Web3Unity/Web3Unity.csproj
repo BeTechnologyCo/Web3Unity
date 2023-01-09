@@ -8,13 +8,8 @@
     <PackageReference Include="Nethereum.Contracts" Version="4.12.0" />
     <PackageReference Include="Nethereum.JsonRpc.RpcClient" Version="4.12.0" />
     <PackageReference Include="Nethereum.Web3" Version="4.12.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="UniTask" Version="2.3.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\BeTechnologyCo\WalletConnectSharp\WalletConnectSharp.Core\WalletConnectSharp.Core.csproj" />
-    <ProjectReference Include="..\..\BeTechnologyCo\WalletConnectSharp\WalletConnectSharp.Desktop\WalletConnectSharp.Desktop.csproj" />
-    <ProjectReference Include="..\..\BeTechnologyCo\WalletConnectSharp\WalletConnectSharp.NEthereum\WalletConnectSharp.NEthereum.csproj" />
   </ItemGroup>
 
   <ItemGroup>

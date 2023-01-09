@@ -10,7 +10,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using TokenContract;
-using WalletConnectSharp.Desktop;
 using Web3Unity;
 
 namespace Web3TestApp
@@ -47,8 +46,9 @@ namespace Web3TestApp
 
         public void Connect()
         {
-            Uri = Web3Connect.Instance.ConnectWalletConnect("https://rpc.ankr.com/fantom_testnet");
+            //Uri = Web3Connect.Instance.ConnectWalletConnect("https://rpc.ankr.com/fantom_testnet");
             //Uri = Web3Connect.Instance.Web3WC.Uri;
+            Web3Connect.Instance.ConnectMetamask();
             Debug.WriteLine($"URI {Uri}");
         }
 
@@ -68,7 +68,7 @@ namespace Web3TestApp
         public async Task Approve()
         {
             var contract = new TokenContractService("0x61A154Ef11d64309348CAA98FB75Bd82e58c9F89");
-            var receipt = await contract.ApproveRequestAndWaitForReceiptAsync(new ApproveFunction() { FromAddress= "0xd6c39eff66c319c60ca4e85e6a5585a35c850f24", Amount = 10, Spender = "0x0b33fA091642107E3a63446947828AdaA188E276" });
+            var receipt = await contract.ApproveRequestAndWaitForReceiptAsync(new ApproveFunction() { FromAddress = "0xd6c39eff66c319c60ca4e85e6a5585a35c850f24", Amount = 10, Spender = "0x0b33fA091642107E3a63446947828AdaA188E276" });
             bool success = receipt.Succeeded();
             Debug.WriteLine($"receipt {success}");
         }

@@ -29,6 +29,23 @@ namespace Web3Unity
             }
         }
 
+        private MetamaskProvider MetamaskProvider
+        {
+            get
+            {
+                return Web3Connect.Instance.MetamaskProvider;
+            }
+        }
+
+        private ConnectionType ConnectionType
+        {
+            get
+            {
+                return Web3Connect.Instance.ConnectionType;
+            }
+        }
+
+
         public Web3Contract(string _address)
         {
             this.Address = _address;
@@ -37,20 +54,42 @@ namespace Web3Unity
 
         public async Task<U> Call<T, U>(T _function) where T : FunctionMessage, new() where U : IFunctionOutputDTO, new()
         {
-            var contractHandler = Web3.Eth.GetContractQueryHandler<T>();
-            return await contractHandler.QueryAsync<U>(Address, _function);
+            if (ConnectionType == ConnectionType.Metamask)
+            {
+                return await MetamaskProvider.Call<T, U>(_function, Address);
+            }
+            else
+            {
+                var contractHandler = Web3.Eth.GetContractQueryHandler<T>();
+                return await contractHandler.QueryAsync<U>(Address, _function);
+            }
+
         }
 
         public async Task<string> Send<T>(T _function) where T : FunctionMessage, new()
         {
-            var contractHandler = Web3.Eth.GetContractTransactionHandler<T>();
-            return await contractHandler.SendRequestAsync(Address, _function);
+            if (ConnectionType == ConnectionType.Metamask)
+            {
+                return await MetamaskProvider.Send<T>(_function, Address);
+            }
+            else
+            {
+                var contractHandler = Web3.Eth.GetContractTransactionHandler<T>();
+                return await contractHandler.SendRequestAsync(Address, _function);
+            }
         }
 
         public async Task<TransactionReceipt> SendWaitForReceipt<T>(T _function) where T : FunctionMessage, new()
         {
-            var contractHandler = Web3.Eth.GetContractTransactionHandler<T>();
-            return await contractHandler.SendRequestAndWaitForReceiptAsync(Address, _function);
+            if (ConnectionType == ConnectionType.Metamask)
+            {
+                return await MetamaskProvider.SendAndWaitForReceipt<T>(_function, Address);
+            }
+            else
+            {
+                var contractHandler = Web3.Eth.GetContractTransactionHandler<T>();
+                return await contractHandler.SendRequestAndWaitForReceiptAsync(Address, _function);
+            }
         }
 
         public async Task<U> SendWaitForEvent<T, U>(T _function) where T : FunctionMessage, new() where U : new()
@@ -87,14 +126,28 @@ namespace Web3Unity
 
         public async Task<HexBigInteger> EstimateGas<T>(T _function) where T : FunctionMessage, new()
         {
-            var contractHandler = Web3.Eth.GetContractTransactionHandler<T>();
-            return await contractHandler.EstimateGasAsync(Address, _function);
+            if (ConnectionType == ConnectionType.Metamask)
+            {
+                return await MetamaskProvider.EstimateGas<T>(_function, Address);
+            }
+            else
+            {
+                var contractHandler = Web3.Eth.GetContractTransactionHandler<T>();
+                return await contractHandler.EstimateGasAsync(Address, _function);
+            }
         }
 
         public async Task<string> SignFunction<T>(T _function) where T : FunctionMessage, new()
         {
-            var contractHandler = Web3.Eth.GetContractTransactionHandler<T>();
-            return await contractHandler.SignTransactionAsync(Address, _function);
+            if (ConnectionType == ConnectionType.Metamask)
+            {
+                return await MetamaskProvider.SignFunction<T>(_function, Address);
+            }
+            else
+            {
+                var contractHandler = Web3.Eth.GetContractTransactionHandler<T>();
+                return await contractHandler.SignTransactionAsync(Address, _function);
+            }
         }
     }
 }

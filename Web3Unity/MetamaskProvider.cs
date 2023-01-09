@@ -12,6 +12,7 @@ using Newtonsoft.Json.Linq;
 using Org.BouncyCastle.Asn1.Ocsp;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -57,6 +58,7 @@ namespace Web3Unity
             {
                 utcs[key].TrySetResult(val);
                 Debug.Log($"Key found Web3GL {key}");
+                Debug.Log($"val Web3GL {val}");
             }
             else
             {
@@ -73,26 +75,26 @@ namespace Web3Unity
                     utcsConnected?.TrySetResult(result);
                     if (OnAccountConnected != null)
                     {
-                        OnAccountConnected(new MetamaskProvider(), result);
+                        OnAccountConnected(Web3Connect.Instance.MetamaskProvider, result);
                     }
 
                     break;
                 case 2:
                     if (OnChainChanged != null)
                     {
-                        OnChainChanged(new MetamaskProvider(), BigInteger.Parse(result));
+                        OnChainChanged(Web3Connect.Instance.MetamaskProvider, BigInteger.Parse(result));
                     }
                     break;
                 case 3:
                     if (OnAccountChanged != null)
                     {
-                        OnAccountChanged(new MetamaskProvider(), result);
+                        OnAccountChanged(Web3Connect.Instance.MetamaskProvider, result);
                     }
                     break;
                 case 4:
                     if (OnAccountDisconnected != null)
                     {
-                        OnAccountDisconnected(new MetamaskProvider(), new EventArgs());
+                        OnAccountDisconnected(Web3Connect.Instance.MetamaskProvider, new EventArgs());
                     }
                     break;
             }
@@ -108,9 +110,12 @@ namespace Web3Unity
         }
 
 
-        public MetamaskProvider()
+        public MetamaskProvider(bool autoConnect)
         {
-            ConnectAccount();
+            if (autoConnect)
+            {
+                ConnectAccount();
+            }
         }
 
 
@@ -136,10 +141,14 @@ namespace Web3Unity
 
         public async Task<T> SendRequestAsync<T>(RpcRequest request, string route = null)
         {
+            Debug.Log($"SendRequestAsync T {typeof(T)}");
             RpcResponseMessage response = await SendAsync(request.Method, request.RawParameters);
+            Debug.Log($"Response  {response.Result}");
             try
             {
-                return response.GetResult<T>();
+                var result = response.GetResult<T>();
+                Debug.Log($"Result  {result}");
+                return result;
             }
             catch (FormatException formatException)
             {
@@ -150,6 +159,7 @@ namespace Web3Unity
         public async Task<T> SendRequestAsync<T>(string method, string route = null, params object[] paramList)
         {
             RpcResponseMessage response = await SendAsync(method, paramList);
+            Debug.Log($"SendRequestAsync Method T {typeof(T)}");
             try
             {
                 return response.GetResult<T>();
@@ -173,7 +183,25 @@ namespace Web3Unity
         private async Task<RpcResponseMessage> SendAsync(string method, params object[] paramList)
         {
             int val = ++id;
-            MetamaskRequest rpcRequest = new MetamaskRequest(val, method, GetSelectedAddress(), paramList);
+            var account = GetSelectedAddress();
+            if (paramList != null && paramList.Length > 0)
+            {
+                var callInput = paramList[0] as CallInput;
+                if (callInput != null)
+                {
+                    callInput.From = account;
+                }
+                else
+                {
+                    var transactionInput = paramList[0] as TransactionInput;
+                    if (transactionInput != null)
+                    {
+                        transactionInput.From = account;
+                    }
+                }
+            }
+            MetamaskRequest rpcRequest = new MetamaskRequest(val, method, account, paramList);
+
             var jsonCall = JsonConvert.SerializeObject(rpcRequest);
             RpcResponseMessage response = await RequestCallAsync(val, jsonCall);
             HandleRpcError(response, method);
@@ -185,6 +213,116 @@ namespace Web3Unity
             if (response.HasError)
                 throw new RpcResponseException(new RpcError(response.Error.Code, response.Error.Message + ": " + reqMsg,
                     response.Error.Data));
+        }
+
+        public  async Task<U> Call<T, U>(T _function, string _address) where T : FunctionMessage, new() where U : IFunctionOutputDTO, new()
+        {
+
+            var callInput = _function.CreateCallInput(_address);
+            var account = GetSelectedAddress();
+            callInput.From = account;
+            var parameters = new object[1] { callInput };
+            int val = ++id;
+            RpcRequestMessage rpcRequest = new RpcRequestMessage(val, "eth_call", parameters);
+            var jsonCall = JsonConvert.SerializeObject(rpcRequest);
+            Console.WriteLine("jsoncall " + jsonCall);
+            RpcResponseMessage response = await RequestCallAsync(val, jsonCall);
+            if (!string.IsNullOrEmpty(response.Error?.Message))
+            {
+                throw new Exception(response.Error?.Message);
+            }
+            Console.WriteLine("result " + response.GetResult<string>());
+            var decode = new FunctionCallDecoder().DecodeFunctionOutput<U>(response.GetResult<string>());
+            return decode;
+        }
+
+
+        public async Task<string> Send<T>(T _function, string _address) where T : FunctionMessage, new()
+        {
+            var transactioninput = _function.CreateTransactionInput(_address);
+            var account = GetSelectedAddress();
+            transactioninput.From = account;
+            var parameters = new object[1] { transactioninput };
+            int val = ++id;
+            MetamaskRequest rpcRequest = new MetamaskRequest(val, "eth_sendTransaction", account, parameters);
+            var jsonCall = JsonConvert.SerializeObject(rpcRequest);
+            RpcResponseMessage response = await RequestCallAsync(val, jsonCall);
+            if (!string.IsNullOrEmpty(response.Error?.Message))
+            {
+                throw new Exception(response.Error?.Message);
+            }
+            Console.WriteLine("result " + response.GetResult<string>());
+            return response.GetResult<string>();
+        }
+
+        public async Task<TransactionReceipt> SendAndWaitForReceipt<T>(T _function, string _address) where T : FunctionMessage, new()
+        {
+            var getReceipt = await Send(_function, _address);
+            var parameters = new object[1] { getReceipt };
+            int val = ++id;
+            RpcRequestMessage rpcRequest = new RpcRequestMessage(val, "eth_getTransactionReceipt", parameters);
+            var jsonCall = JsonConvert.SerializeObject(rpcRequest);
+            RpcResponseMessage response = await RequestCallAsync(val, jsonCall);
+            if (!string.IsNullOrEmpty(response.Error?.Message))
+            {
+                throw new Exception(response.Error?.Message);
+            }
+            TransactionReceipt transaction = response.GetResult<TransactionReceipt>();
+            Console.WriteLine("result " + transaction.TransactionHash);
+            return transaction;
+        }
+
+        public  async Task<HexBigInteger> EstimateGas<T>(T _function, string _address) where T : FunctionMessage, new()
+        {
+            var transactioninput = _function.CreateTransactionInput(_address);
+            var account = GetSelectedAddress();
+            transactioninput.From = account;
+            var parameters = new object[1] { transactioninput };
+            int val = ++id;
+            MetamaskRequest rpcRequest = new MetamaskRequest(val, "eth_estimateGas", account, parameters);
+            var jsonCall = JsonConvert.SerializeObject(rpcRequest);
+            RpcResponseMessage response = await RequestCallAsync(val, jsonCall);
+            if (!string.IsNullOrEmpty(response.Error?.Message))
+            {
+                throw new Exception(response.Error?.Message);
+            }
+            Console.WriteLine("result " + response.GetResult<HexBigInteger>());
+            return response.GetResult<HexBigInteger>();
+        }
+
+        public  async Task<string> SignFunction<T>(T _function, string _address) where T : FunctionMessage, new()
+        {
+            string account = GetSelectedAddress();
+            var transactioninput = _function.CreateTransactionInput(_address);           
+            transactioninput.From = account;
+            var parameters = new object[2] { account, transactioninput.Value };
+            int val = ++id;
+            RpcRequestMessage rpcRequest = new RpcRequestMessage(val, "eth_sign", parameters);
+            var jsonCall = JsonConvert.SerializeObject(rpcRequest);
+            Console.WriteLine("jsoncall " + jsonCall);
+            RpcResponseMessage response = await RequestCallAsync(val, jsonCall);
+            if (!string.IsNullOrEmpty(response.Error?.Message))
+            {
+                throw new Exception(response.Error?.Message);
+            }
+            Console.WriteLine("result " + response.GetResult<string>());
+            return response.GetResult<string>();
+        }
+
+        public async Task<string> Sign(string message, MetamaskSignature sign)
+        {
+            var account = GetSelectedAddress();
+            var parameters = new object[2] { GetSelectedAddress(), message };
+            int val = ++id;
+            RpcRequestMessage rpcRequest = new RpcRequestMessage(val, Enum.GetName(typeof(MetamaskSignature), sign), parameters);
+            var jsonCall = JsonConvert.SerializeObject(rpcRequest);
+            RpcResponseMessage response = await RequestCallAsync(val, jsonCall);
+            if (!string.IsNullOrEmpty(response.Error?.Message))
+            {
+                throw new Exception(response.Error?.Message);
+            }
+            Console.WriteLine("result " + response.GetResult<string>());
+            return response.GetResult<string>();
         }
     }
 }
