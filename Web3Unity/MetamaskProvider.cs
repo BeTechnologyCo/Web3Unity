@@ -46,8 +46,8 @@ namespace Web3Unity
         public static event EventHandler<BigInteger> OnChainChanged;
         public static event EventHandler OnAccountDisconnected;
 
-        private static Dictionary<int, UniTaskCompletionSource<string>> utcs = new Dictionary<int, UniTaskCompletionSource<string>>();
-        private static UniTaskCompletionSource<string> utcsConnected;
+        private static Dictionary<int, TaskCompletionSource<string>> utcs = new Dictionary<int, TaskCompletionSource<string>>();
+        private static TaskCompletionSource<string> utcsConnected;
 
         public RequestInterceptor OverridingRequestInterceptor { get; set; }
 
@@ -103,7 +103,7 @@ namespace Web3Unity
 
         public async UniTask<RpcResponseMessage> RequestCallAsync(int val, string jsonCall)
         {
-            utcs[val] = new UniTaskCompletionSource<string>();
+            utcs[val] = new TaskCompletionSource<string>();
             Request(jsonCall, RequestCallResult);
             string result = await utcs[val].Task;
             return JsonConvert.DeserializeObject<RpcResponseMessage>(result);
@@ -121,7 +121,7 @@ namespace Web3Unity
 
         public async Task<string> ConnectAccount()
         {
-            utcsConnected = new UniTaskCompletionSource<string>();
+            utcsConnected = new TaskCompletionSource<string>();
             Connect(Connected);
             string result = await utcsConnected.Task;
             return result;
