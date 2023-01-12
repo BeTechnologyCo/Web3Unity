@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
+using WalletConnectSharp.Core;
 using Web3Unity;
 
 namespace Web3Unity
@@ -37,7 +38,7 @@ namespace Web3Unity
             }
         }
 
-        private WalletConnect WalletConnect
+        private WalletConnectSession WalletConnect
         {
             get
             {

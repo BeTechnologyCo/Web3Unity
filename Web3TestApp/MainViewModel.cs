@@ -46,7 +46,7 @@ namespace Web3TestApp
 
         public void Connect()
         {
-            Uri = Web3Connect.Instance.ConnectWalletConnect("https://rpc.ankr.com/fantom_testnet");
+            Uri = Web3Connect.Instance.ConnectWalletConnect(new WebsharpTransport(),"https://rpc.ankr.com/fantom_testnet");
             //Uri = Web3Connect.Instance.Web3WC.Uri;
             //Web3Connect.Instance.ConnectMetamask();
             Debug.WriteLine($"URI {Uri}");

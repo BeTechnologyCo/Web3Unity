@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using WalletConnectSharp.Core;
 using WalletConnectSharp.Core.Models;
+using WalletConnectSharp.Core.Network;
 using WalletConnectSharp.NEthereum;
 
 namespace Web3Unity
@@ -24,11 +25,12 @@ namespace Web3Unity
 
         public string Uri { get; private set; }
 
-        public WalletConnect Client { get; private set; }
+        public WalletConnectSession Client { get; private set; }
 
         public Web3 Web3Client { get; private set; }
 
         public event EventHandler<string> Connected;
+
 
         //public WalletConnect Client { get; private set; }
 
@@ -77,7 +79,7 @@ namespace Web3Unity
         }
 
 
-        public Web3WC(string rpcUrl, string name, string description, string icon, string url)
+        public Web3WC(ITransport transport, string rpcUrl, string name, string description, string icon, string url)
         {
             var metadata = new ClientMeta()
             {
@@ -87,7 +89,7 @@ namespace Web3Unity
                 URL = url
             };
 
-            Client = new WalletConnect(metadata);
+            Client = new WalletConnectSession(clientMeta : metadata, transport : transport);
             //var nethereum = new Web3(walletConnect.CreateProvider(new Uri("https//rpc.testnet.fantom.network/")));
             Client.OnSessionCreated += Client_OnSessionCreated;
             Client.OnTransportConnect += Client_OnTransportConnect;

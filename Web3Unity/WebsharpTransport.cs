@@ -24,6 +24,10 @@ namespace Web3Unity
 
         public event EventHandler<MessageReceivedEventArgs> MessageReceived;
 
+        public WebsharpTransport()
+        {
+        }
+
         public WebsharpTransport(EventDelegator eventDelegator)
         {
             this._eventDelegator = eventDelegator;

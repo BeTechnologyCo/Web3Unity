@@ -6,6 +6,7 @@ using Nethereum.Web3.Accounts;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using WalletConnectSharp.Core.Network;
 
 namespace Web3Unity
 {
@@ -88,11 +89,11 @@ namespace Web3Unity
         /// <param name="icon">Icon show on the popin</param>
         /// <param name="url">Url to the project</param>
         /// <returns>The uri to connect to wallet connect</returns>
-        public string ConnectWalletConnect(string rpcUrl = "https://rpc.builder0x69.io", string name = "Test Unity", string description = "Test dapp", string icon = "https://unity.com/favicon.ico", string url = "https://unity.com/")
+        public string ConnectWalletConnect(ITransport transport, string rpcUrl = "https://rpc.builder0x69.io", string name = "Test Unity", string description = "Test dapp", string icon = "https://unity.com/favicon.ico", string url = "https://unity.com/")
         {
             ConnectionType = ConnectionType.WalletConnect;
             RpcUrl = rpcUrl;
-            Web3WC = new Web3WC(rpcUrl, name, description, icon, url);
+            Web3WC = new Web3WC(transport, rpcUrl, name, description, icon, url);
             Web3WC.Connected += Web3WC_Connected;
 
             return Web3WC.Uri;
